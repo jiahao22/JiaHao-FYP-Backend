@@ -26,7 +26,7 @@ class UserAddress(Resource):
                "msg": "Please provide the address_id to continue."
             }
 
-        self.cursor.execute("SELECT address.address_id, address.address_fullname, address.address_phone_number, address.address_line1, address.address_line2, address.address_city, address.address_state, address.address_postcode, address.address_status FROM address WHERE address.address_user_id = '{}' AND address.address_id = '{}'".format(user_id, address_id))
+        self.cursor.execute("SELECT address.address_id, address.address_fullname, address.address_phone_number, address.address_line1, address.address_line2, address.address_city, address.address_state, address.address_postcode, address.address_status FROM address WHERE address.address_user_id = '{}' AND address.address_id = '{}' AND address.address_status = 1".format(user_id, address_id))
         address = self.cursor.fetchall()
         self.dbConn.close()
 
@@ -92,7 +92,7 @@ class UserGetAllAddress(Resource):
                 "msg" : "Please provide the user_id to continue."
             }
 
-        self.cursor.execute("SELECT address.address_id, address.address_fullname, address.address_phone_number, address.address_line1, address.address_line2, address.address_city, address.address_postcode, address.address_status, address.address_updated_on, address.address_created_on, state.state_name AS address_state FROM address LEFT JOIN state ON state.state_id = address.address_state WHERE address.address_user_id = '{}'".format(user_id))
+        self.cursor.execute("SELECT address.address_id, address.address_fullname, address.address_phone_number, address.address_line1, address.address_line2, address.address_city, address.address_postcode, address.address_status, address.address_updated_on, address.address_created_on, state.state_name AS address_state FROM address LEFT JOIN state ON state.state_id = address.address_state WHERE address.address_user_id = '{}' AND address.address_status = 1".format(user_id))
         addresses = self.cursor.fetchall()
 
         if len(addresses) > 0:
