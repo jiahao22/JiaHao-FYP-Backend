@@ -26,6 +26,7 @@ class UserLogin(Resource):
                 "valid": True,
                 "user_id": result[0]['user_id'],
                 "user_email": result[0]['user_email'],
+                "user_fullname": result[0]['user_fullname'],
                 "access_token": create_access_token(identity=data['wallet_address']),
                 "wallet_address": data['wallet_address'],
                 "expired_on": int(time.time()) + (86400 * 3)
@@ -85,11 +86,14 @@ class UserRegister(Resource):
 
         if self.cursor.rowcount > 0:
             return {
-                "valid": True
+                "valid": True,
+                "user_id": self.cursor.lastrowid,
+                "user_email": user_email,
+                "user_fullname": user_fullname,
+                "access_token": create_access_token(identity=user_wallet_address),
+                "wallet_address": user_wallet_address,
+                "expired_on": int(time.time()) + (86400 * 3)
             }
-        return {
-            "valid": False
-        }
 
 
 class UserCheckAccountExists(Resource):

@@ -1,6 +1,7 @@
 from datetime import timedelta
 from flask import Flask
 from flask_restful import Api
+from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
 # Import the Users class
@@ -16,6 +17,8 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=3)
 
 api = Api(app)
 jwt = JWTManager(app)
+
+CORS(app)
 
 api_url = '/api/'
 
