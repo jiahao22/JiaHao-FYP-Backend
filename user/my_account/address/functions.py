@@ -167,6 +167,6 @@ class UserGetAllAddress(Resource):
                 "addresses": addresses
             }
         return {
-            "valid": False,
+            "valid": True,
             "addresses": []
         }
