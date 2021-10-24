@@ -31,8 +31,10 @@ class UserAddress(Resource):
         self.dbConn.close()
 
         if len(address) > 0:
-            address[0]['valid'] = True 
-            return address[0]
+            return {
+                "valid": True,
+                "address": address[0]
+            }
         return {
             "valid" : False
         }
