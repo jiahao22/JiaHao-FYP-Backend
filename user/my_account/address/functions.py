@@ -50,11 +50,7 @@ class UserAddress(Resource):
         addressParser.add_argument('address_postcode', type=str, required=True, help="This field is required. [type=string]")
         data = addressParser.parse_args()
 
-        # Insert without address_line2
-        if data['address_line2'] == None:
-            self.cursor.execute("INSERT INTO address SET address_user_id = '{}', address_fullname = '{}', address_phone_number = '{}', address_line1 = '{}', address_city = '{}', address_state = '{}', address_postcode = '{}'".format(data['address_user_id'], data['address_fullname'], data['address_phone_number'], data['address_line1'], data['address_city'], data['address_state'], data['address_postcode']))
-        else:
-            self.cursor.execute("INSERT INTO address SET address_user_id = '{}', address_fullname = '{}', address_phone_number = '{}', address_line1 = '{}', address_line2 = '{}', address_city = '{}', address_state = '{}', address_postcode = '{}'".format(data['address_user_id'], data['address_fullname'], data['address_phone_number'], data['address_line1'], data['address_line2'], data['address_city'], data['address_state'], data['address_postcode']))
+        self.cursor.execute("INSERT INTO address SET address_user_id = '{}', address_fullname = '{}', address_phone_number = '{}', address_line1 = '{}', address_line2 = '{}', address_city = '{}', address_state = '{}', address_postcode = '{}'".format(data['address_user_id'], data['address_fullname'], data['address_phone_number'], data['address_line1'], data['address_line2'], data['address_city'], data['address_state'], data['address_postcode']))
         self.dbConn.commit()
         self.dbConn.close()
 
@@ -70,11 +66,77 @@ class UserAddress(Resource):
 
     @jwt_required()
     def put(self):
-        return
+        addressParser = reqparse.RequestParser(bundle_errors=True)
+        addressParser.add_argument('address_id', type=int, required=True, help="This field is required. [type=int]")
+        addressParser.add_argument('address_user_id', type=int, required=True, help="This field is required. [type=int]")
+        addressParser.add_argument('address_fullname', type=str, required=True, help="This field is required. [type=string]")
+        addressParser.add_argument('address_phone_number', type=str, required=True, help="This field is required. [type=string]")
+        addressParser.add_argument('address_line1', type=str, required=True, help="This field is required. [type=string]")
+        addressParser.add_argument('address_line2', type=str)
+        addressParser.add_argument('address_city', type=str, required=True, help="This field is required. [type=string]")
+        addressParser.add_argument('address_state', type=int, required=True, help="This field is required. [type=int]")
+        addressParser.add_argument('address_postcode', type=str, required=True, help="This field is required. [type=string]")
+        data = addressParser.parse_args()
+
+        self.cursor.execute("SELECT * FROM address WHERE address.address_user_id = '{}' AND address.address_id = '{}'".format(data['address_user_id'], data['address_id']))
+        countResult = self.cursor.fetchall()
+        
+        if len(countResult) == 0:
+            return {
+                "valid": False,
+                "msg":"Address not found."
+            }
+
+        # Update without address_line2
+        self.cursor.execute("UPDATE address SET address_fullname = '{}', address_phone_number = '{}', address_line1 = '{}', address_city = '{}', address_state = '{}', address_postcode = '{}', address_line2 = '{}', address_updated_on = CURRENT_TIMESTAMP() WHERE address.address_id = '{}'".format(data['address_fullname'], data['address_phone_number'], data['address_line1'], data['address_city'], data['address_state'], data['address_postcode'], data['address_line2'],  data['address_id'] ))
+        self.dbConn.commit()
+        self.dbConn.close()
+
+        if self.cursor.rowcount > 0:
+            return {
+                'valid' : True
+            }
+        return {
+            'valid' : False
+        }
 
     @jwt_required()
     def delete(self):
-        return
+        user_id = request.args.get('user_id')
+        address_id = request.args.get('address_id')
+
+        if user_id == None or user_id.strip() == "":
+            return {
+                "valid" : False,
+                "msg" : "Please provide the user_id to continue."
+            }
+
+        if address_id == None or address_id.strip() == "":
+            return {
+               "valid": False, 
+               "msg": "Please provide the address_id to continue."
+            }
+
+        self.cursor.execute("SELECT * FROM address WHERE address.address_user_id = '{}' AND address.address_id = '{}'".format(user_id, address_id))
+        countResult = self.cursor.fetchall()
+        
+        if len(countResult) == 0:
+            return {
+                "valid": False,
+                "msg":"Address not found."
+            }
+
+        self.cursor.execute("UPDATE address SET address.address_status = 2, address.address_updated_on = CURRENT_TIMESTAMP() WHERE address.address_user_id = '{}' AND address.address_id = '{}'".format(user_id, address_id))
+        self.dbConn.commit()
+        self.dbConn.close()
+
+        if self.cursor.rowcount > 0:
+            return {
+                'valid' : True
+            }
+        return {
+            'valid' : False
+        }
 
 class UserGetAllAddress(Resource):
 
