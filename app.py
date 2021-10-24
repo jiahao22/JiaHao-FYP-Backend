@@ -9,7 +9,10 @@ from user.auth.functions import UserCheckAccountExists, UserLogin, UserRegister
 from user.my_account.profile.functions import UserMyAccountProfile
 from user.my_account.address.functions import UserAddress, UserGetAllAddress
 
-from shared.sharedFunctions import getStateList
+# Import the Merchants class
+from merchant.auth.functions import MerchantLogin, MerchantRegister
+
+from shared.sharedFunctions import getStateList, ipfs
 
 app = Flask(__name__)
 
@@ -35,8 +38,14 @@ api.add_resource(UserAddress, api_url + '/user/my-account/address')
 api.add_resource(UserGetAllAddress, api_url + '/user/my-account/addresses')
 # Users Module End
 
+# Merchant Module Start
+api.add_resource(MerchantLogin, api_url + '/merchant/auth/login')
+api.add_resource(MerchantRegister, api_url + '/merchant/auth/register')
+# Mercahnt Module End
+
 # Shared Module Start
 api.add_resource(getStateList, api_url + '/shared/state')
+api.add_resource(ipfs, api_url + '/shared/ipfs')
 # Shared Module End
 
 if __name__ == "__main__":
